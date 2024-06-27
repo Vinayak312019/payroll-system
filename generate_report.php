@@ -1,6 +1,18 @@
 <?php
 include 'config.php';
 
+// Custom rounding function
+function custom_round($value) {
+    $rounded_value = round($value, 2); // Round to 2 decimal places first
+    $fractional_part = $rounded_value - floor($rounded_value);
+
+    if ($fractional_part >= 0.50) {
+        return ceil($rounded_value); // Round up if fractional part is 0.50 or more
+    } else {
+        return floor($rounded_value); // Round down if fractional part is less than 0.50
+    }
+}
+
 // Function to get the number of days in a specific month and year
 function getDaysInMonth($month, $year) {
     return cal_days_in_month(CAL_GREGORIAN, $month, $year);
@@ -53,10 +65,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_employee_id'])) {
     
     // Calculate updated values
     $edit_per_day_salary = $edit_basic_salary / $days_in_month;
-    $edit_inhand_salary = $edit_per_day_salary * $edit_present_days;
-    $edit_overtime_pay = $edit_per_day_salary * $edit_overtime_days;
-    $edit_total_pay = $edit_inhand_salary + $edit_overtime_pay + $edit_other + $edit_bonus;
-    $edit_net_pay = $edit_total_pay - ($edit_pf + $edit_esic + $edit_loan_deducted + $edit_lwf + $edit_profession_tax);
+    $edit_inhand_salary = custom_round($edit_per_day_salary * $edit_present_days);
+    $edit_overtime_pay = custom_round($edit_per_day_salary * $edit_overtime_days);
+    $edit_total_pay = custom_round($edit_inhand_salary + $edit_overtime_pay + $edit_other + $edit_bonus);
+    $edit_net_pay = custom_round($edit_total_pay - ($edit_pf + $edit_esic + $edit_loan_deducted + $edit_lwf + $edit_profession_tax));
 
     // Update Payroll record
     $sql_update = "UPDATE Payroll SET
@@ -182,6 +194,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_employee_id'])) {
             margin-top: 20px;
             color: #666;
         }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            background-color: #333;
+            overflow: hidden;
+        }
+        li {
+            float: left;
+        }
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+        li a:hover {
+            background-color: #111;
+        }
     </style>
 </head>
 <body>
@@ -242,10 +274,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_employee_id'])) {
                                 <td><?php echo $payroll['LoanDeducted']; ?></td>
                                 <td><?php echo $payroll['LWF']; ?></td>
                                 <td><?php echo $payroll['ProfessionTax']; ?></td>
-                                <td><?php echo $payroll['InhandSalary']; ?></td>
-                                <td><?php echo $payroll['OvertimePay']; ?></td>
-                                <td><?php echo $payroll['TotalPay']; ?></td>
-                                <td><?php echo $payroll['NetPay']; ?></td>
+                                <td><?php echo custom_round($payroll['InhandSalary']); ?></td>
+                                <td><?php echo custom_round($payroll['OvertimePay']); ?></td>
+                                <td><?php echo custom_round($payroll['TotalPay']); ?></td>
+                                <td><?php echo custom_round($payroll['NetPay']); ?></td>
                                 <td><?php echo number_format($payroll['BasicSalary'] / getDaysInMonth($payroll['Month'], $payroll['Year']), 2); ?></td>
                                 <td>
                                     <form method="post" class="edit-form" action="<?php echo $_SERVER['PHP_SELF']; ?>">
@@ -277,6 +309,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_employee_id'])) {
             </div>
         <?php endif; ?>
     </div>
+    <ul>
+        <li><a href="index.php">Main Page</a></li>
+        <li><a href="list_employees.php">Edit/Delete Employee</a></li>
+        <li><a href="process_payroll.php">Process Payroll</a></li>
+        <li><a href="add_employee.php">Add Employee</a></li>
+    </ul>
     <footer>
         <p>&copy; <?php echo date("Y"); ?> Vinayak Dhananjay Sharma. All rights reserved.</p>
     </footer>
