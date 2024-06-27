@@ -126,6 +126,26 @@ $employees = $conn->query($sql);
             margin-top: 20px;
             color: #666;
         }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            background-color: #333;
+            overflow: hidden;
+        }
+        li {
+            float: left;
+        }
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+        li a:hover {
+            background-color: #111;
+        }
     </style>
 </head>
 <body>
@@ -163,6 +183,12 @@ $employees = $conn->query($sql);
             <input type="submit" value="Process Payroll">
         </form>
     </div>
+    <ul>
+            <li><a href="index.php">Main Page</a></li>
+            <li><a href="list_employees.php">Edit/Delete Employee</a></li>
+            <li><a href="add_employee.php">Add Employee</a></li>
+            <li><a href="generate_report.php">Generate Report</a></li>
+        </ul>
 
     <!-- Copyright Notice -->
     <footer>
